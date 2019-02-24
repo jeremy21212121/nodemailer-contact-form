@@ -54,14 +54,16 @@ const sendMail = (req,res,next) => {
       from: config.mail.from,
       text: utils.text.buildText(contactMsg)
   };
-  transporter.sendMail(mailOptions,  (err, info) => {
-      if (err || info.rejected.length) {
-          next( utils.buildError('sendmail') )
-      } else {
-          res.json({success: true});
-      }
-  });
-
+  //~ transporter.sendMail(mailOptions,  (err, info) => {
+      //~ if (err || info.rejected.length) {
+          //~ next( utils.buildError('sendmail') )
+      //~ } else {
+          //~ res.json({success: true});
+      //~ }
+  //~ });
+  //stub for testing, doesnt actually send mail
+  console.log(mailOptions);
+  res.json({success: true});
 }
 
 const router = express.Router();
