@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
         pass: config.auth.pass
     }
 });
-// errorHandler.fatal(err)
+
 transporter.verify( (err, success) => {
   if (err)  {
     errorHandler.fatal(err);
