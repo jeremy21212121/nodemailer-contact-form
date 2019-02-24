@@ -1,0 +1,85 @@
+'use strict';
+
+const express = require('express');
+const nodemailer = require('nodemailer');
+const rateLimit = require('express-rate-limit');
+
+const config = require('./config.js');
+
+const middleware = require('./lib/middleware.js');
+const utils = require('./lib/utils.js');
+const errorHandler = require('./lib/errorHandler.js');
+
+const app = express();
+app.enable("trust proxy"); //for proxying by eg. nginx in prod
+app.set('x-powered-by', false);// this header is not needed
+
+
+const transporter = nodemailer.createTransport({
+    service: config.service,
+    auth: {
+        user: config.auth.user,
+        pass: config.auth.pass
+    }
+});
+// errorHandler.fatal(err)
+transporter.verify( (err, success) => {
+  if (err)  {
+    errorHandler.fatal(err);
+  } else {
+    console.log('Server is ready to accept messages')
+  }
+});
+
+app.use(express.json());
+
+if (process.env.NODE_ENV !== 'production') {
+// serve a demo contact form for testing/dev purposes
+  app.use(express.static(__dirname + '/public'));
+  app.get('/', (req, res) => {
+      res.sendfile('./public/index.html')
+  })
+};
+
+
+const sendMail = (req,res,next) => {
+  const contactMsg = {
+    name: utils.text.sanitizeInput(req.body.name, 90),
+    email: utils.text.sanitizeEmailAddr(req.body.email),
+    text: utils.text.sanitizeInput(req.body.text)
+  };
+  const mailOptions = {
+      to: config.mail.to,
+      subject: `${config.mail.subject} ${contactMsg.name}`,
+      from: config.mail.from,
+      text: utils.text.buildText(contactMsg)
+  };
+  transporter.sendMail(mailOptions,  (err, info) => {
+      if (err || info.rejected.length) {
+          next( utils.buildError('sendmail') )
+      } else {
+          res.json({success: true});
+      }
+  });
+
+}
+
+const router = express.Router();
+router.use(middleware.limiter);
+router.use(middleware.verifyContentType);
+router.use(middleware.verifyContactMsgObj);
+router.use(middleware.antiSpam);
+router.post('/send', sendMail);
+router.use( (req,res,next) => {
+  // returns 404 when no routes match. enables sending a json 404 response
+  next( utils.buildError('not-found') )
+});
+
+app.use('/', router);
+
+app.use( errorHandler.main );
+
+const server = app.listen(config.port, config.host, () => {
+  console.log(`Listening on ${config.host}:${config.port}`)
+});
+server.on('error', errorHandler.fatal);
