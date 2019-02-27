@@ -14,6 +14,16 @@ const app = express();
 app.enable("trust proxy"); //for proxying by eg. nginx in prod
 app.set('x-powered-by', false);// this header is not needed
 
+if (process.env.NODE_ENV !== 'production') {
+  //enable cors because different ports in dev trigger preflight checks
+  const cors = require('cors');
+  app.use(cors());
+// serve a demo contact form for testing/dev purposes
+  app.use(express.static(__dirname + '/public'));
+  app.get('/', (req, res) => {
+      res.sendfile('./public/index.html')
+  })
+};
 
 const transporter = nodemailer.createTransport({
     service: config.service,
@@ -33,13 +43,7 @@ transporter.verify( (err, success) => {
 
 app.use(express.json());
 
-if (process.env.NODE_ENV !== 'production') {
-// serve a demo contact form for testing/dev purposes
-  app.use(express.static(__dirname + '/public'));
-  app.get('/', (req, res) => {
-      res.sendfile('./public/index.html')
-  })
-};
+
 
 
 const sendMail = (req,res,next) => {
@@ -60,9 +64,8 @@ const sendMail = (req,res,next) => {
       } else {
           res.json({success: true});
       }
-  });
-
-}
+  })
+};
 
 const router = express.Router();
 router.use(middleware.limiter);

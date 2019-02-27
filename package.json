@@ -18,6 +18,7 @@
     "homepage": "https://github.com/jeremy21212121/express-nodemailer-contact-form#readme",
     "dependencies": {
         "body-parser": "^1.18.3",
+        "cors": "^2.8.5",
         "express": "^4.16.3",
         "express-rate-limit": "^3.1.1",
         "nodemailer": "^4.6.8"
