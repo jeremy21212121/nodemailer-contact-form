@@ -55,6 +55,7 @@ const sendMail = (req,res,next) => {
       to: config.mail.to,
       subject: `${config.mail.subject} ${contactMsg.name}`,
       from: config.mail.from,
+      replyTo: contactMsg.email,
       text: utils.text.buildText(contactMsg)
   };
   transporter.sendMail(mailOptions,  (err, info) => {
