@@ -47,7 +47,7 @@ app.use(express.json());
 
 const sendMail = (req,res,next) => {
   const contactMsg = {
-    name: utils.text.sanitizeInput(req.body.name, 90),
+    name: utils.text.sanitizeInput(req.body.name, 100),
     email: utils.text.sanitizeEmailAddr(req.body.email),
     text: utils.text.sanitizeInput(req.body.text)
   };
