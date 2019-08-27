@@ -19,9 +19,8 @@ if (process.env.NODE_ENV !== 'production') {
   const cors = require('cors');
   app.use(cors());
 // serve a demo contact form for testing/dev purposes
-  app.use(express.static(__dirname + '/public'));
-  app.get('/', (req, res) => {
-      res.sendfile('./public/index.html')
+  app.get('/static/form', (req, res) => {
+      res.sendFile(__dirname + '/public/index.html')
   })
 };
 
