@@ -25,11 +25,11 @@
     </noscript>
 
       <section class="contact-form">
-        <form id="contact-form-element" action="/send" method="post">
+        <form id="contact-form-element" action="/v1/send" method="post">
           <input type="text" id="name" name="name" placeholder="name" maxlength="90" required>
           <input type="email" id="email" name="email" placeholder="email" maxlength="90" required>
           <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="phone" maxlength="10" value="0000000000" required>
-          <textarea id="text" name="text" rows="8" maxlength="400" required></textarea>
+          <textarea id="text" name="text" rows="8" maxlength="1024" required></textarea>
           <span id="contact-form-status"></span>
           <button type="submit" id="submit" name="submit" disabled="true">Submit</button>
         </form>
@@ -61,7 +61,7 @@
           var req = new XMLHttpRequest();
           var url = form.action;
           req.open(form.method.toUpperCase(), url, true);
-          req.setRequestHeader('Content-type', 'application/json');
+          req.setRequestHeader('content-type', 'application/json');
 
           req.onreadystatechange = function() {
             if (req.readyState === 4) {
