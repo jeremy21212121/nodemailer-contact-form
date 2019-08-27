@@ -78,7 +78,7 @@ router.use( (req,res,next) => {
   next( utils.buildError('not-found') )
 });
 
-app.use('/', router);
+app.use('/v1', router);
 
 app.use( errorHandler.main );
 
