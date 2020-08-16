@@ -13,10 +13,23 @@ module.exports = {
     from: secrets.user,
     subject: 'Website contact from:'// + name
   },
-  limiter: {
-    //max requests/minutes per IP address.
-    //rejected POST's count towards this limit (so if ie. the antispam middleware blocks the request, it still counts towards their limit)
-    minutes: 30,
-    maxRequests: 10,
-  }
+  middleware: {
+    limiter: {
+      //max requests/minutes per IP address.
+      //rejected POST's count towards this limit (so if ie. the antispam middleware blocks the request, it still counts towards their limit)
+      minutes: 30,
+      maxRequests: 10,
+    },
+    validReferers: [
+      // allowed referer request header values used by verifyReferer middleware
+      'https://waxshop.ca',
+      'https://dev.waxshop.ca'
+    ],
+    requiredBodyFields: [
+      // the post request body must be an object that has the following properties
+      'name',
+      'email',
+      'text'
+    ]
+  },
 };

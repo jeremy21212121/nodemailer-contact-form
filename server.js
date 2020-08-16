@@ -14,10 +14,11 @@ const app = express();
 app.enable("trust proxy"); //for proxying by eg. nginx in prod
 app.set('x-powered-by', false);// this header is not needed
 
+//enable cors to support staging domain
+const cors = require('cors');
+app.use(cors());
+
 if (process.env.NODE_ENV !== 'production') {
-  //enable cors because different ports in dev trigger preflight checks
-  const cors = require('cors');
-  app.use(cors());
 // serve a demo contact form for testing/dev purposes
   app.get('/static/form', (req, res) => {
       res.sendFile(__dirname + '/public/index.html')
@@ -69,6 +70,7 @@ const sendMail = (req,res,next) => {
 
 const router = express.Router();
 router.use(middleware.limiter);
+router.use(middleware.verifyReferer);
 router.use(middleware.verifyContentType);
 router.use(middleware.verifyContactMsgObj);
 router.use(middleware.antiSpam);
