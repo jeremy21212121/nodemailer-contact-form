@@ -2,7 +2,6 @@
 
 const express = require('express');
 const nodemailer = require('nodemailer');
-const rateLimit = require('express-rate-limit');
 
 const config = require('./config.js');
 
@@ -73,7 +72,6 @@ router.use(middleware.limiter);
 router.use(middleware.verifyReferer);
 router.use(middleware.verifyContentType);
 router.use(middleware.verifyContactMsgObj);
-router.use(middleware.antiSpam);
 router.post('/send', sendMail);
 router.use( (req,res,next) => {
   // returns 404 when no routes match. enables sending a json 404 response
