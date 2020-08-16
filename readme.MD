@@ -45,7 +45,7 @@ module.exports = {
 ```node server.js``` to start the server.
 
 
-Visit ```http://localhost:8080/``` in your web browser to try it out.
+Visit ```http://localhost:8080/static/form``` in your web browser to try it out.
 
 
 - in production:
@@ -100,8 +100,9 @@ Requires=network-online.target nginx.service
 After=syslog.target network-online.target
 
 [Service]
+ # if using nvm, the location of the node binary will be different. run `which node` to find out where
 ExecStart=/usr/bin/node /opt/express-nodemailer-contact-api/server.js
-\# Required on some systems
+ # Required on some systems
 WorkingDirectory=/opt/express-nodemailer-contact-api
 Restart=always
  # Restart service after 10 seconds if node service crashes
@@ -123,7 +124,7 @@ Notes:
 * Requires/After is to make our service start after syslog is up (for logging), the network stack has an IP address and nginx is started
 * Working directory is apparently needed on some systems
 
-Move the .service file to ```/etc/systemd/service``` and run (as root/sudo): 
+Move the .service file to ```/etc/systemd/system``` and run (as root/sudo): 
 
 ```
 systemctl daemon-reload
