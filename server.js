@@ -1,88 +1,41 @@
-'use strict';
+"use strict";
 
-const express = require('express');
-const nodemailer = require('nodemailer');
+const main = async () => {
+  const express = require("express");
+  const config = require("./config.js");
+  const createTransport = require("./lib/createTransport.js");
+  const errorHandler = require("./lib/errorHandler.js");
 
-const config = require('./config.js');
+  const app = express();
+  // for proxying by eg. nginx in prod
+  app.enable("trust proxy");
+  // express doesn't need us to advertise for them
+  app.set("x-powered-by", false);
+  //enable cors to support cross-domain requests
+  const cors = require("cors");
+  app.use(cors());
+  app.use(express.json());
 
-const middleware = require('./lib/middleware.js');
-const utils = require('./lib/utils.js');
-const errorHandler = require('./lib/errorHandler.js');
-
-const app = express();
-app.enable("trust proxy"); //for proxying by eg. nginx in prod
-app.set('x-powered-by', false);// this header is not needed
-
-//enable cors to support staging domain
-const cors = require('cors');
-app.use(cors());
-
-if (process.env.NODE_ENV !== 'production') {
-// serve a demo contact form for testing/dev purposes
-  app.get('/static/form', (req, res) => {
-      res.sendFile(__dirname + '/public/index.html')
-  })
-};
-
-const transporter = nodemailer.createTransport({
-    service: config.service,
-    auth: {
-        user: config.auth.user,
-        pass: config.auth.pass
-    }
-});
-
-transporter.verify( (err, success) => {
-  if (err)  {
-    errorHandler.fatal(err);
-  } else {
-    console.log('Server is ready to accept messages')
+  // serve a demo contact form for testing/dev purposes
+  if (process.env.NODE_ENV !== "production") {
+    app.get("/static/form", (req, res) => {
+      res.sendFile(__dirname + "/public/index.html");
+    });
   }
-});
 
-app.use(express.json());
+  // creates and verfies the transporter
+  const transporter = await createTransport();
+  // creates a sendMail controller using the above transporter
+  const sendMail = require("./lib/controllers.js").sendMail(transporter);
+  const router = require("./lib/router.js")(express, sendMail);
 
+  app.use("/v1", router);
+  app.use(errorHandler.main);
 
-
-
-const sendMail = (req,res,next) => {
-  const contactMsg = {
-    name: utils.text.sanitizeInput(req.body.name, 100),
-    email: utils.text.sanitizeEmailAddr(req.body.email),
-    text: utils.text.sanitizeInput(req.body.text)
-  };
-  const mailOptions = {
-      to: config.mail.to,
-      subject: `${config.mail.subject} ${contactMsg.name}`,
-      from: config.mail.from,
-      replyTo: contactMsg.email,
-      text: utils.text.buildText(contactMsg)
-  };
-  transporter.sendMail(mailOptions,  (err, info) => {
-      if (err || info.rejected.length) {
-          next( utils.buildError('sendmail') )
-      } else {
-          res.json({success: true});
-      }
-  })
+  const server = app.listen(config.port, config.host, () => {
+    console.log(`Listening on ${config.host}:${config.port}`);
+  });
+  server.on("error", errorHandler.fatal);
 };
 
-const router = express.Router();
-router.use(middleware.limiter);
-router.use(middleware.verifyReferer);
-router.use(middleware.verifyContentType);
-router.use(middleware.verifyContactMsgObj);
-router.post('/send', sendMail);
-router.use( (req,res,next) => {
-  // returns 404 when no routes match. enables sending a json 404 response
-  next( utils.buildError('not-found') )
-});
-
-app.use('/v1', router);
-
-app.use( errorHandler.main );
-
-const server = app.listen(config.port, config.host, () => {
-  console.log(`Listening on ${config.host}:${config.port}`)
-});
-server.on('error', errorHandler.fatal);
+main();

@@ -28,7 +28,6 @@
         <form id="contact-form-element" action="/v1/send" method="post">
           <input type="text" id="name" name="name" placeholder="name" maxlength="90" required>
           <input type="email" id="email" name="email" placeholder="email" maxlength="90" required>
-          <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" placeholder="phone" maxlength="10" value="0000000000" required>
           <textarea id="text" name="text" rows="8" maxlength="1024" required></textarea>
           <span id="contact-form-status"></span>
           <button type="submit" id="submit" name="submit" disabled="true">Submit</button>
@@ -42,10 +41,6 @@
 
         window.addEventListener('load',function() { form.elements.submit.disabled = false } );
 
-        var validatePhone = function(dataObj, phoneNumberStr) {
-          if (phoneNumberStr==="0000000000") { return };
-          dataObj.phone = phoneNumberStr;
-        }
 
         form.addEventListener('submit', function(e) {
 
@@ -55,8 +50,6 @@
             email:e.target.elements.email.value,
             text: e.target.elements.text.value
           };
-
-          validatePhone(data, e.target.elements.phone.value);
 
           var req = new XMLHttpRequest();
           var url = form.action;
@@ -70,7 +63,7 @@
                   statusSpan.innerText = "Message sent. Thanks!";
                   break;
                 case 403:
-                  statusSpan.innerText = "Terribly sorry, your message was flagged as spam.";
+                  statusSpan.innerText = "Terribly sorry, your referer header was invalid.";
                   break;
                 case 429:
                   const mins = Math.round((parseInt(req.getResponseHeader('X-RateLimit-Reset')) - (Date.now()/1000))/60 );
