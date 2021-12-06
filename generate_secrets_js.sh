@@ -6,7 +6,8 @@ if [ ! -f secrets.js ]; then
     echo "module.exports = {
     user: 'username@domain.com',
     pass: 'your_pass_here',
-    to: 'target@domain.com'
+    to: 'target@domain.com',
+    cc: 'cc@domain.com,cc2@domain.com'
 };" > secrets.js
     echo "Done!"
     exit 0
