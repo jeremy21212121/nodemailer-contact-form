@@ -11,6 +11,7 @@ module.exports = {
   mail: {
     to: secrets.to,
     from: secrets.user,
+    cc: secrets.cc,
     subject: 'Website contact from:'// + name
   },
   middleware: {
