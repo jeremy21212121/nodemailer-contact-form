@@ -20,11 +20,11 @@ module.exports = {
       minutes: 30,
       maxRequests: 10,
     },
-    validHosts: [
+    validReferers: [
       // allowed host request header values used by verifyHost middleware
-      'waxshop.ca',
-      'dev.waxshop.ca',
-      // 'localhost:8080'
+      'https://waxshop.ca',
+      'https://dev.waxshop.ca',
+      // 'localhost:8080' // for dev/testing
     ],
     requiredBodyFields: [
       // the post request body must be an object that has the following properties
