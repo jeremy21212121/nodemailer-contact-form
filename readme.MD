@@ -20,9 +20,7 @@ Validates and sanitizes user supplied information. Secure defaults like binding 
 
 Gracefully handles operational errors.
 
-Bot-resistant***: Generic spam bots shouldnt succeed at sending email.
-
-Configurable rate-limiting by IP in case abuse gets through.
+Configurable rate-limiting by IP.
 
 Run as a system service in production. Logging, monitoring, etc.
 

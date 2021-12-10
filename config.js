@@ -17,18 +17,18 @@ module.exports = {
   middleware: {
     limiter: {
       //max requests/minutes per IP address.
-      //rejected POST's count towards this limit (so if ie. the antispam middleware blocks the request, it still counts towards their limit)
+      //rejected POST's count towards this limit
       minutes: 30,
       maxRequests: 10,
     },
-    validHosts: [
+    validReferers: [
       // allowed host request header values used by verifyHost middleware
-      'waxshop.ca',
-      'dev.waxshop.ca',
-      // 'localhost:8080'
+      'https://waxshop.ca',
+      'https://dev.waxshop.ca',
+      //'http://localhost:8080' // for dev/testing
     ],
     requiredBodyFields: [
-      // the post request body must be an object that has the following properties
+      // the post request body must be a JSON object that has the following properties
       'name',
       'email',
       'text'
