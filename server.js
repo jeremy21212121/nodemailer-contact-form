@@ -29,7 +29,7 @@ const main = async () => {
   const sendMail = require("./lib/controllers.js").sendMail(transporter);
   const router = require("./lib/router.js")(express, sendMail);
 
-  app.use("/v2", router);
+  app.use("/v1", router);
   app.use(errorHandler.main);
 
   const server = app.listen(config.port, config.host, () => {
